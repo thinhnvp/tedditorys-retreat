@@ -1626,7 +1626,7 @@ section,
 }
 
 .services .details {
-  background: color-mix(in srgb, var(--surface-color), transparent 5%);
+  background: color-mix(in srgb, var(--surface-color), transparent 24%);
   position: absolute;
   left: 20px;
   right: 20px;

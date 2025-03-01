@@ -1774,13 +1774,7 @@ figure figcaption {
   background: #fff;
   margin-top: -100px;
   -webkit-box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.1);
-  display: none; /* Hide on mobile */ }
-  @media (min-width: 820px) {
-    .featured-property-half {
-      display: block; /* Show on desktop */
-    }
-  }
+  box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.1); }
   .featured-property-half div {
     width: 50%; }
   .featured-property-half .image {

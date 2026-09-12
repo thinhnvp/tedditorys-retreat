@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:migrate": "tsx scripts/migrate.ts",
     "inquiries:list": "tsx scripts/list-inquiries.ts",
-    "inquiries:send-payment-link": "tsx scripts/send-payment-link.ts"
+    "inquiries:send-payment-link": "tsx scripts/send-payment-link.ts",
+    "itinerary:seed": "tsx scripts/seed-itinerary.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

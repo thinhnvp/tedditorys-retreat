@@ -51,7 +51,7 @@ function normalizeInquiry<T extends Record<string, unknown>>(row: T): T {
 
 let sql: NeonQueryFunction<false, false> | null = null;
 
-function getSql(): NeonQueryFunction<false, false> {
+export function getSql(): NeonQueryFunction<false, false> {
   if (sql) return sql;
   const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   if (!connectionString) {

@@ -61,9 +61,13 @@ export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise
     listingName,
     checkIn: inquiry.check_in,
     checkOut: inquiry.check_out,
+    nights: quote.nights,
     guests: inquiry.guests,
     checkInTime: listing?.checkInTime ?? "3:00 PM",
     checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    nightlyRate: quote.nightlyRate,
+    guestSurchargePerNight: quote.guestSurcharge,
+    cleaningFee: listing?.cleaningFee ?? 0,
     total: quote.total,
     // A "monthly average" doesn't mean anything for a capped-length stay.
     monthlyAverage: listing?.maxNights ? null : quote.monthlyAverage,

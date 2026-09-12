@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import type { Inquiry } from "./db";
 import { getListing } from "./listings";
 import type { Quote } from "./pricing";
-import { renderInquiryConfirmationEmail, renderHostNotificationEmail, type InquiryEmailData } from "./email-templates";
+import { renderInquiryEmail, inquirySubject, type InquiryEmailData } from "./email-templates";
 
 let resend: Resend | null = null;
 
@@ -23,16 +23,13 @@ function formatMoney(cents: number): string {
   return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 }
 
-export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise<void> {
+function toEmailData(inquiry: Inquiry, quote: Quote): InquiryEmailData {
   const listing = getListing(inquiry.listing_slug);
-  const listingName = listing?.name ?? inquiry.listing_slug;
-  const client = getResend();
-
-  const emailData: InquiryEmailData = {
+  return {
     guestName: inquiry.name,
     guestEmail: inquiry.email,
     guestPhone: inquiry.phone,
-    listingName,
+    listingName: listing?.name ?? inquiry.listing_slug,
     checkIn: inquiry.check_in,
     checkOut: inquiry.check_out,
     nights: quote.nights,
@@ -48,24 +45,25 @@ export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise
     referenceCode: inquiry.reference_code,
     message: inquiry.message,
   };
+}
 
-  const host = renderHostNotificationEmail(emailData);
-  await client.emails.send({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    replyTo: inquiry.email,
-    subject: `New inquiry: ${listingName} — ${inquiry.name}`,
-    html: host.html,
-    text: host.text,
-  });
+/**
+ * One email, guest as primary recipient and the host CC'd, so both parties
+ * land in the same thread from the start — a reply-all (from either side,
+ * automated follow-ups included) keeps the whole conversation together.
+ */
+export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise<void> {
+  const data = toEmailData(inquiry, quote);
+  const client = getResend();
+  const { html, text } = renderInquiryEmail(data);
 
-  const guest = renderInquiryConfirmationEmail(emailData);
   await client.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
-    subject: `We got your inquiry for ${listingName}`,
-    html: guest.html,
-    text: guest.text,
+    cc: TO_EMAIL,
+    subject: inquirySubject(data),
+    html,
+    text,
   });
 }
 
@@ -81,8 +79,8 @@ export async function sendPaymentLinkEmail(
   await client.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
-    replyTo: TO_EMAIL,
-    subject: `Complete your booking — ${listingName}`,
+    cc: TO_EMAIL,
+    subject: `Re: ${inquirySubject({ listingName, referenceCode: inquiry.reference_code })}`,
     text: [
       `Hi ${inquiry.name},`,
       "",
@@ -109,7 +107,7 @@ export async function sendPaymentReceivedEmail(
   await client.emails.send({
     from: FROM_EMAIL,
     to: TO_EMAIL,
-    subject: `Payment received: ${inquiry.name} — ${listingName}`,
+    subject: `Re: ${inquirySubject({ listingName, referenceCode: inquiry.reference_code })} — Payment received`,
     text: [
       `Reference: ${inquiry.reference_code}`,
       `Listing: ${listingName}`,

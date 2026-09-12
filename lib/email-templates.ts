@@ -121,12 +121,10 @@ export type InquiryEmailData = {
   message?: string | null;
 };
 
-function stayRows(data: InquiryEmailData): string[] {
-  return [
-    row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
-    row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
-    row("Guests", plural(data.guests, "guest")),
-  ];
+/** Subject reused verbatim (with "Re:" on follow-ups) so every email about
+ *  this inquiry threads together for guest and host alike. */
+export function inquirySubject(data: Pick<InquiryEmailData, "listingName" | "referenceCode">): string {
+  return `Your inquiry — ${data.listingName} (ref ${data.referenceCode})`;
 }
 
 function breakdownRows(data: InquiryEmailData): string[] {
@@ -145,44 +143,41 @@ function breakdownRows(data: InquiryEmailData): string[] {
   ];
 }
 
-function totalRows(data: InquiryEmailData): string[] {
-  return [
-    row("Total", money(data.total), { strong: true }),
-    data.monthlyAverage !== null ? row("Monthly average", money(data.monthlyAverage)) : "",
-  ];
-}
+/**
+ * The single email sent for a new inquiry — the guest is the primary
+ * recipient and the host is CC'd (see sendInquiryEmails), so this content
+ * is written for both audiences at once and never includes anything
+ * host-only (internal instructions, etc). Replying-all keeps everyone in
+ * one thread from here on, including later follow-ups like a payment link.
+ */
+export function renderInquiryEmail(data: InquiryEmailData): { html: string; text: string } {
+  const card = renderDetailsCard([
+    [row("Phone", data.guestPhone)],
+    [
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
+      row("Guests", plural(data.guests, "guest")),
+    ],
+    breakdownRows(data),
+    [
+      row("Total", money(data.total), { strong: true }),
+      data.monthlyAverage !== null ? row("Monthly average", money(data.monthlyAverage)) : "",
+    ],
+  ]);
 
-function textStaySection(data: InquiryEmailData): string {
-  const extraGuests = data.guests - 1;
-  const nightsLine = plural(data.nights, "night");
-  return [
-    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
-    `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
-    `Guests: ${plural(data.guests, "guest")}`,
-    "",
-    `  ${money(data.nightlyRate)}/night × ${nightsLine} = ${money(data.nightlyRate * data.nights)}`,
-    extraGuests > 0
-      ? `  +${money(data.guestSurchargePerNight)}/night × ${extraGuests} extra guest × ${nightsLine} = ${money(data.guestSurchargePerNight * data.nights)}`
-      : null,
-    data.cleaningFee > 0 ? `  Cleaning fee (one-time): ${money(data.cleaningFee)}` : null,
-    `Total: ${money(data.total)}`,
-    data.monthlyAverage !== null ? `Monthly average: ${money(data.monthlyAverage)}` : null,
-  ]
-    .filter((line) => line !== null)
-    .join("\n");
-}
-
-export function renderInquiryConfirmationEmail(data: InquiryEmailData): { html: string; text: string } {
-  const card = renderDetailsCard([stayRows(data), breakdownRows(data), totalRows(data)]);
+  const messageBlock = data.message
+    ? paragraph(`&ldquo;${data.message}&rdquo;`, { padBottom: 0 })
+    : "";
 
   const body = [
-    paragraph(`Hi ${data.guestName},`, { padTop: 24, size: 16, emphasis: true }),
+    paragraph(`Hi ${data.guestName},`, { size: 16, emphasis: true }),
     paragraph(
       `Thanks for reaching out about <strong style="color:${COLORS.ink};">${data.listingName}</strong>. Here&rsquo;s what we received:`,
       { padBottom: 24 }
     ),
     `<tr><td style="padding:0 32px;">${card}</td></tr>`,
-    paragraph("Our team will follow up by email or phone soon to confirm details and next steps."),
+    messageBlock,
+    paragraph("We&rsquo;ll follow up right here to confirm details and next steps."),
     paragraph(`Reference: <strong style="color:${COLORS.ink};">${data.referenceCode}</strong>`, {
       padTop: 8,
       padBottom: 24,
@@ -195,74 +190,38 @@ export function renderInquiryConfirmationEmail(data: InquiryEmailData): { html: 
     body,
   });
 
+  const nightsLine = plural(data.nights, "night");
+  const extraGuests = data.guests - 1;
+  const textBreakdown = [
+    `  ${money(data.nightlyRate)}/night × ${nightsLine} = ${money(data.nightlyRate * data.nights)}`,
+    extraGuests > 0
+      ? `  +${money(data.guestSurchargePerNight)}/night × ${extraGuests} extra guest × ${nightsLine} = ${money(data.guestSurchargePerNight * data.nights)}`
+      : null,
+    data.cleaningFee > 0 ? `  Cleaning fee (one-time): ${money(data.cleaningFee)}` : null,
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+
   const text = [
     `Hi ${data.guestName},`,
     "",
     `Thanks for reaching out about ${data.listingName}. Here's what we received:`,
     "",
-    textStaySection(data),
+    `Phone: ${data.guestPhone}`,
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
+    `Guests: ${plural(data.guests, "guest")}`,
     "",
-    "Our team will follow up by email or phone soon to confirm details and next steps.",
+    textBreakdown,
+    `Total: ${money(data.total)}`,
+    data.monthlyAverage !== null ? `Monthly average: ${money(data.monthlyAverage)}` : null,
+    data.message ? `\n"${data.message}"` : null,
+    "",
+    "We'll follow up right here to confirm details and next steps.",
     "",
     `Reference: ${data.referenceCode}`,
     "",
     "— Tedditory Retreat",
-  ].join("\n");
-
-  return { html, text };
-}
-
-export function renderHostNotificationEmail(data: InquiryEmailData): { html: string; text: string } {
-  const contact = [
-    row("Guest", data.guestName),
-    row("Email", data.guestEmail),
-    row("Phone", data.guestPhone),
-  ];
-  const card = renderDetailsCard([contact, stayRows(data), breakdownRows(data), totalRows(data)]);
-
-  const messageBlock = data.message
-    ? paragraph(`&ldquo;${data.message}&rdquo;`, { size: 13, padBottom: 8 })
-    : "";
-
-  const body = [
-    paragraph(`New inquiry for <strong style="color:${COLORS.ink};">${data.listingName}</strong>.`, {
-      padTop: 24,
-      padBottom: 24,
-      size: 16,
-      emphasis: true,
-    }),
-    `<tr><td style="padding:0 32px;">${card}</td></tr>`,
-    messageBlock,
-    paragraph("Reply to this email to reach the guest directly.", { padTop: 24 }),
-    paragraph(
-      `When you&rsquo;re ready to collect payment, tell Claude Code: &ldquo;send a payment link for ${data.referenceCode}, $&lt;amount&gt;&rdquo;.`,
-      { padTop: 8 }
-    ),
-    paragraph(`Reference: <strong style="color:${COLORS.ink};">${data.referenceCode}</strong>`, {
-      padTop: 8,
-      padBottom: 24,
-      size: 13,
-    }),
-  ].join("");
-
-  const html = renderShell({
-    preheader: `New inquiry for ${data.listingName} — reference ${data.referenceCode}.`,
-    body,
-  });
-
-  const text = [
-    `New inquiry: ${data.listingName}`,
-    "",
-    `Reference: ${data.referenceCode}`,
-    `Guest: ${data.guestName}`,
-    `Email: ${data.guestEmail}`,
-    `Phone: ${data.guestPhone}`,
-    "",
-    textStaySection(data),
-    data.message ? `\nMessage: ${data.message}` : null,
-    "",
-    "Reply to this email to reach the guest directly.",
-    `When you're ready to collect payment, tell Claude Code: "send a payment link for ${data.referenceCode}, $<amount>".`,
   ]
     .filter((line) => line !== null)
     .join("\n");

@@ -20,6 +20,11 @@ function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
+/** Emails show a single check-in time, not the full arrival window — "3:00 PM–11:00 PM" becomes "3:00 PM". */
+function firstTime(time: string): string {
+  return time.split(/[-–—]/)[0].trim();
+}
+
 function row(label: string, value: string, opts: { strong?: boolean; muted?: boolean } = {}): string {
   const valueWeight = opts.strong ? "700" : "500";
   const valueSize = opts.strong ? "16px" : "14px";
@@ -169,7 +174,7 @@ export function renderInquiryEmail(data: InquiryEmailData): { html: string; text
   const card = renderDetailsCard([
     [row("Phone", data.guestPhone)],
     [
-      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`),
       row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
       row("Guests", plural(data.guests, "guest")),
     ],
@@ -223,7 +228,7 @@ export function renderInquiryEmail(data: InquiryEmailData): { html: string; text
     `Thanks for reaching out about ${data.listingName}. Here's what we received:`,
     "",
     `Phone: ${data.guestPhone}`,
-    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`,
     `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
     `Guests: ${plural(data.guests, "guest")}`,
     "",
@@ -251,6 +256,7 @@ export type PaymentLinkEmailData = {
   checkOut: string;
   checkInTime: string;
   checkOutTime: string;
+  guests: number;
   amountCents: number;
   checkoutUrl: string;
   referenceCode: string;
@@ -261,8 +267,9 @@ export function renderPaymentLinkEmail(data: PaymentLinkEmailData): { html: stri
   const amount = money(data.amountCents / 100);
   const card = renderDetailsCard([
     [
-      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`),
       row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
+      row("Guests", plural(data.guests, "guest")),
     ],
     [row("Amount due", amount, { strong: true })],
   ]);
@@ -293,8 +300,9 @@ export function renderPaymentLinkEmail(data: PaymentLinkEmailData): { html: stri
     "",
     `Here's a secure link to complete payment and lock in ${data.listingName}:`,
     "",
-    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`,
     `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
+    `Guests: ${plural(data.guests, "guest")}`,
     `Amount due: ${amount}`,
     "",
     data.checkoutUrl,
@@ -316,6 +324,7 @@ export type PaymentReceivedEmailData = {
   checkOut: string;
   checkInTime: string;
   checkOutTime: string;
+  guests: number;
   amountCents: number;
   referenceCode: string;
 };
@@ -325,8 +334,9 @@ export function renderPaymentReceivedEmail(data: PaymentReceivedEmailData): { ht
   const amount = money(data.amountCents / 100);
   const card = renderDetailsCard([
     [
-      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`),
       row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
+      row("Guests", plural(data.guests, "guest")),
     ],
     [row("Amount paid", amount, { strong: true })],
   ]);
@@ -356,8 +366,9 @@ export function renderPaymentReceivedEmail(data: PaymentReceivedEmailData): { ht
     "",
     `Payment received — you're all set for ${data.listingName}.`,
     "",
-    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${firstTime(data.checkInTime)} Pacific Time`,
     `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
+    `Guests: ${plural(data.guests, "guest")}`,
     `Amount paid: ${amount}`,
     "",
     "We'll follow up right here with anything else you need before check-in.",

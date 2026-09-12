@@ -87,6 +87,7 @@ export async function sendPaymentLinkEmail(
     checkOut: inquiry.check_out,
     checkInTime: listing?.checkInTime ?? "3:00 PM",
     checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    guests: inquiry.guests,
     amountCents,
     checkoutUrl,
     referenceCode: inquiry.reference_code,
@@ -124,6 +125,7 @@ export async function sendPaymentReceivedEmail(
     checkOut: inquiry.check_out,
     checkInTime: listing?.checkInTime ?? "3:00 PM",
     checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    guests: inquiry.guests,
     amountCents: amountCents ?? inquiry.amount_cents ?? 0,
     referenceCode: inquiry.reference_code,
   };

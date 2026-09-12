@@ -8,6 +8,11 @@ import { formatFriendlyDate } from "@/lib/format";
 export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+  // While a click-triggered scroll is settling, ignore the observer — it
+  // would otherwise see the scroll-in-progress and momentarily fight the
+  // click's own selection.
+  const suppressObserverRef = useRef(false);
+  const suppressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // One point per item: an activity's own location, or a commute's
   // destination (arrival = "where you are now"). If the day opens with a
@@ -25,6 +30,7 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        if (suppressObserverRef.current) return;
         const visible = entries.filter((e) => e.isIntersecting);
         if (visible.length === 0) return;
         const topMost = visible.reduce((a, b) => (a.boundingClientRect.top < b.boundingClientRect.top ? a : b));
@@ -34,8 +40,21 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
       { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
     );
     itemRefs.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current);
+    };
   }, [day.items]);
+
+  function handleSelect(i: number) {
+    setActiveIndex(i);
+    suppressObserverRef.current = true;
+    itemRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current);
+    suppressTimeoutRef.current = setTimeout(() => {
+      suppressObserverRef.current = false;
+    }, 700);
+  }
 
   return (
     <div className="itinerary-day reveal">
@@ -53,7 +72,7 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
               }}
               className={`${item.type === "commute" ? "commute" : "activity"}${i === activeIndex ? " active" : ""}`}
               key={i}
-              onClick={() => setActiveIndex(i)}
+              onClick={() => handleSelect(i)}
             >
               <span className="itinerary-time">
                 {item.fromTime}

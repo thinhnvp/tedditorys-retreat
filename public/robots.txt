@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /booking/
 
 Sitemap: https://retreat.tedditory.co/sitemap.xml

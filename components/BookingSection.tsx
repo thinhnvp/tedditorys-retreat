@@ -124,7 +124,7 @@ export default function BookingSection({ listing }: { listing: Listing }) {
 
         <h2 className="h-sm">House rules</h2>
         <ul className="rules-list">
-          <li>Check-in after {listing.checkInTime}</li>
+          <li>{listing.checkInTime.includes("–") ? `Check-in: ${listing.checkInTime}` : `Check-in after ${listing.checkInTime}`}</li>
           <li>Check-out by {listing.checkOutTime}</li>
           {listing.houseRules.map((rule) => (
             <li key={rule}>{rule}</li>

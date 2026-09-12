@@ -98,29 +98,76 @@ export default function BookingSection({ listing }: { listing: Listing }) {
   return (
     <>
       <div className="listing-body reveal">
-        <h2 className="h-sm">About this room</h2>
-        <p>{listing.description}</p>
-
-        {listing.curatedExperience && (
+        {listing.experienceTagline ? (
+          <p className="listing-promise">{listing.description}</p>
+        ) : (
           <>
-            <h2 className="h-sm">What&apos;s included</h2>
-            <ul className="rules-list">
-              {listing.curatedExperience.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+            <h2 className="h-sm">About this room</h2>
+            <p>{listing.description}</p>
           </>
         )}
 
-        <h2 className="h-sm">What this place offers</h2>
+        {listing.experienceHighlights && (
+          <>
+            <h2 className="h-sm">A stay built around you</h2>
+            <div className="experience-grid">
+              {listing.experienceHighlights.map((item) => (
+                <div className="experience-card" key={item.title}>
+                  <h4>{item.title}</h4>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {listing.howItWorks && (
+          <>
+            <h2 className="h-sm">How your stay works</h2>
+            <ol className="steps-list">
+              {listing.howItWorks.map((s) => (
+                <li key={s.step}>
+                  <span className="step-num">{s.step}</span>
+                  <div>
+                    <h4>{s.title}</h4>
+                    <p>{s.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+
+        <h2 className="h-sm">{listing.experienceTagline ? "Your room" : "What this place offers"}</h2>
         <ul className="amenity-grid">
           {listing.amenities.map((a) => (
             <li key={a}>{a}</li>
           ))}
         </ul>
 
-        <h2 className="h-sm">The neighborhood</h2>
+        <h2 className="h-sm">{listing.neighborhoodHeading ?? "The neighborhood"}</h2>
         <p>{listing.neighborhood}</p>
+        {listing.nearbyEssentials && (
+          <>
+            <p className="sub-label">Nearby essentials</p>
+            <ul className="rules-list">
+              {listing.nearbyEssentials.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {listing.whoItsFor && (
+          <>
+            <h2 className="h-sm">Who this stay is for</h2>
+            <ul className="rules-list">
+              {listing.whoItsFor.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <h2 className="h-sm">House rules</h2>
         <ul className="rules-list">
@@ -130,6 +177,13 @@ export default function BookingSection({ listing }: { listing: Listing }) {
             <li key={rule}>{rule}</li>
           ))}
         </ul>
+
+        {listing.valueFraming && (
+          <div className="value-framing">
+            <h4>{listing.valueFraming.heading}</h4>
+            <p>{listing.valueFraming.body}</p>
+          </div>
+        )}
 
         <h2 className="h-sm">Two ways to book</h2>
         <p>

@@ -1,3 +1,6 @@
+export type ExperienceHighlight = { title: string; description: string };
+export type StayStep = { step: string; title: string; description: string };
+
 export type Listing = {
   slug: string;
   name: string;
@@ -31,13 +34,31 @@ export type Listing = {
   tagline?: string;
   /** Set when the stay is arranged individually rather than open to any dates. */
   inquiryOnly?: boolean;
-  /** Bundled, hosted inclusions beyond standard room amenities (tours, transport, etc). */
-  curatedExperience?: string[];
   minNights?: number;
   maxNights?: number;
   /** Applied to the nightly rate once a stay reaches weeklyDiscountMinNights. */
   weeklyDiscountPercent?: number;
   weeklyDiscountMinNights?: number;
+
+  /**
+   * Hero subtitle for hosted-experience listings (e.g. "Seattle, curated for
+   * you."). Presence of this field marks the listing as an "experience"
+   * product and switches on the richer page sections below — other listings
+   * stay on the plain room-rental layout.
+   */
+  experienceTagline?: string;
+  /** Rich "what's included" cards — replaces a flat bullet list for experience listings. */
+  experienceHighlights?: ExperienceHighlight[];
+  /** Numbered "how your stay works" steps, shown only for experience listings. */
+  howItWorks?: StayStep[];
+  /** Who this stay is built for, shown as a short list. */
+  whoItsFor?: string[];
+  /** Short value-framing block shown just above pricing. */
+  valueFraming?: { heading: string; body: string };
+  /** Custom heading for the neighborhood section (defaults to "The neighborhood"). */
+  neighborhoodHeading?: string;
+  /** Secondary, practical nearby list shown under the broader neighborhood framing. */
+  nearbyEssentials?: string[];
 };
 
 export const LISTINGS: Listing[] = [
@@ -181,15 +202,53 @@ export const LISTINGS: Listing[] = [
     maxNights: 13,
     weeklyDiscountPercent: 12,
     weeklyDiscountMinNights: 7,
+    experienceTagline: "Seattle, curated for you.",
     cardFeature:
-      "A fully hosted stay in Renton, arranged around you — door-to-door arrival coordination, days planned around what you actually want, and an evening of wine and music along the way. By inquiry only.",
+      "A fully hosted stay in Renton, arranged around you — coordinated arrival, a personal Seattle plan, and an evening that's become a house tradition. By inquiry only.",
     description:
-      "The Elysian Escape isn't really a room you book — it's a stay someone plans for you. Arrival is coordinated door-to-door, so you're not left figuring out a rideshare on no sleep. From there, your days get built around what you're actually here for — a specific list of restaurants, a slower pace, or just better recommendations than a search engine gives you. Most stays end up with an evening of wine and music that's turned into something of a house tradition. Because every stay is arranged this way, dates are confirmed by request rather than instant booking.",
-    curatedExperience: [
-      "Door-to-door arrival coordination",
-      "Your days planned around what you're actually here for",
-      "An evening of wine and music that's become a house tradition",
+      "The Elysian Escape isn't really a room you book — it's a stay someone plans for you. Arrival is coordinated, your days are shaped around what you actually want, and one evening usually turns into wine, music, and something of a house tradition. Because every stay is arranged this way, dates are confirmed by request rather than instant booking.",
+    experienceHighlights: [
+      {
+        title: "Arrival, handled",
+        description:
+          "We coordinate your trip from SEA to the house, so your stay starts without figuring out transportation after a long flight.",
+      },
+      {
+        title: "A Seattle plan made for you",
+        description:
+          "Tell us what you like — food, neighborhoods, nature, nightlife, quiet days, tech, photography, or something else. A personal Seattle itinerary is waiting when you arrive: follow it completely, steal a few ideas, or change course entirely.",
+      },
+      {
+        title: "The Elysian evening",
+        description:
+          "One evening, you're invited to wine, music, and karaoke at the house. Casual, optional, and something of a tradition here.",
+      },
+      {
+        title: "Support while you're here",
+        description: "Plans change. If they do, reach out directly for the rest of your stay — not a call center, just us.",
+      },
     ],
+    howItWorks: [
+      { step: "01", title: "Before you arrive", description: "You answer a few questions about how you like to travel." },
+      { step: "02", title: "We build your stay", description: "You receive a curated plan built around your interests, pace, and dates." },
+      { step: "03", title: "Arrival is coordinated", description: "We'll help get you from SEA to Elysian without the usual arrival friction." },
+      { step: "04", title: "Make it yours", description: "Use the itinerary as much or as little as you'd like." },
+      {
+        step: "05",
+        title: "One night, stay in",
+        description: "Wine, music, and karaoke at the house — totally optional, and something you can opt into while we build your plan.",
+      },
+    ],
+    whoItsFor: [
+      "Solo travelers who want good company without obligation",
+      "Couples looking for something more personal than a hotel",
+      "First-time Seattle visitors who don't know where to start",
+      "Anyone who'd rather not spend their trip planning it",
+    ],
+    valueFraming: {
+      heading: "More than a room",
+      body: "Every Elysian stay includes private accommodation plus personal trip planning, arrival coordination, and a hosted evening. There are no separate concierge fees.",
+    },
     amenities: [
       "Private bathroom",
       "Smart lock",
@@ -202,8 +261,14 @@ export const LISTINGS: Listing[] = [
       "Shared living room",
       "Workspace",
     ],
+    neighborhoodHeading: "A quiet base for exploring Seattle",
     neighborhood:
-      "Windsor Hills is a quiet, residential corner of Renton, with a small neighborhood green space nearby if you want fresh air without driving. The Landing — Target, Regal Cinemas, and a solid lineup of Korean BBQ, sushi, and poke — is five minutes by car, and the freeway puts Bellevue fifteen minutes out, Tukwila ten.",
+      "Elysian sits in a residential part of Renton, away from the downtown noise but well connected to the region. Seattle, Bellevue, Lake Washington, Southcenter, and SEA are all within easy reach, which lets us build your days in different directions rather than locking you into one neighborhood.",
+    nearbyEssentials: [
+      "Target and Regal Cinemas at The Landing (5 min by car)",
+      "Korean BBQ, sushi, and poke nearby",
+      "Freeway access — Bellevue 15 min, Tukwila 10 min",
+    ],
     reviews: "5.0★ (2 reviews) · Superhost",
     chips: ["Hosted experience", "Door-to-door arrival", "Personalized itinerary", "Inquiry only"],
     houseRules: [

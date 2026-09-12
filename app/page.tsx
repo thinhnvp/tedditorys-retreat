@@ -166,12 +166,13 @@ export default function HomePage() {
             <div className="feature-body">
               <span className="feature-tag">{hideaway.tagline}</span>
               <h2>{hideaway.name}</h2>
+              {hideaway.experienceTagline && <p className="feature-tagline">{hideaway.experienceTagline}</p>}
               <p className="feature-sub">{hideaway.location}</p>
               <p className="feature-desc">{hideaway.description}</p>
-              {hideaway.curatedExperience && (
+              {hideaway.experienceHighlights && (
                 <ul className="feature-list">
-                  {hideaway.curatedExperience.map((item) => (
-                    <li key={item}>{item}</li>
+                  {hideaway.experienceHighlights.map((item) => (
+                    <li key={item.title}>{item.title}</li>
                   ))}
                 </ul>
               )}

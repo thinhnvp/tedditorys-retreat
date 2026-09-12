@@ -23,6 +23,32 @@ export type Inquiry = {
   paid_at: string | null;
 };
 
+/**
+ * The Postgres wire protocol reports DATE/TIMESTAMPTZ columns in a form the
+ * driver parses into JS Date objects rather than the plain strings the
+ * `Inquiry` type declares — that declaration is a compile-time assertion
+ * only, not something the driver honors at runtime. Normalize here, once,
+ * so every caller can trust the type.
+ */
+function normalizeInquiry<T extends Record<string, unknown>>(row: T): T {
+  const toDateString = (value: unknown): unknown => {
+    if (!(value instanceof Date)) return value;
+    const y = value.getUTCFullYear();
+    const m = String(value.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(value.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+  const toIsoString = (value: unknown): unknown => (value instanceof Date ? value.toISOString() : value);
+  return {
+    ...row,
+    check_in: toDateString(row.check_in),
+    check_out: toDateString(row.check_out),
+    created_at: toIsoString(row.created_at),
+    updated_at: toIsoString(row.updated_at),
+    paid_at: toIsoString(row.paid_at),
+  };
+}
+
 let sql: NeonQueryFunction<false, false> | null = null;
 
 function getSql(): NeonQueryFunction<false, false> {
@@ -63,7 +89,7 @@ export async function createInquiry(input: {
            ${input.checkIn}, ${input.checkOut}, ${input.guests}, ${input.message ?? null}, ${input.quotedAmountCents})
         RETURNING *
       `) as Inquiry[];
-      return rows[0];
+      return normalizeInquiry(rows[0]);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       if (message.includes("reference_code") && attempt < 4) continue;
@@ -78,7 +104,7 @@ export async function findInquiryByRef(referenceCode: string): Promise<Inquiry |
   const rows = (await db`
     SELECT * FROM inquiries WHERE reference_code = ${referenceCode.toUpperCase()}
   `) as Inquiry[];
-  return rows[0] ?? null;
+  return rows[0] ? normalizeInquiry(rows[0]) : null;
 }
 
 export async function searchInquiries(filter: {
@@ -95,7 +121,7 @@ export async function searchInquiries(filter: {
     ORDER BY created_at DESC
     LIMIT ${limit}
   `) as Inquiry[];
-  return rows;
+  return rows.map(normalizeInquiry);
 }
 
 export async function markAwaitingPayment(
@@ -127,5 +153,5 @@ export async function markPaidByCheckoutSession(
     WHERE stripe_checkout_session_id = ${stripeCheckoutSessionId}
     RETURNING *
   `) as Inquiry[];
-  return rows[0] ?? null;
+  return rows[0] ? normalizeInquiry(rows[0]) : null;
 }

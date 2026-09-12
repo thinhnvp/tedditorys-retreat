@@ -13,7 +13,6 @@ export default function RoomCard({ listing }: { listing: Listing }) {
           sizes="(max-width: 760px) 100vw, 50vw"
           style={{ objectFit: "cover" }}
         />
-        <span className="room-loc">{listing.location}</span>
       </div>
       <div className="room-body">
         <h3>{listing.name}</h3>

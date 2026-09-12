@@ -1,10 +1,6 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 config();
-import { findInquiryByRef, markAwaitingPayment } from "../lib/db";
-import { createCheckoutSessionForInquiry } from "../lib/stripe";
-import { sendPaymentLinkEmail } from "../lib/email";
-import { getListing } from "../lib/listings";
 
 function parseArgs(argv: string[]): Record<string, string> {
   const out: Record<string, string> = {};
@@ -29,33 +25,26 @@ async function main() {
     process.exit(1);
   }
 
-  const inquiry = await findInquiryByRef(ref);
-  if (!inquiry) {
-    console.error(`No inquiry found with reference ${ref}.`);
+  const siteUrl = process.env.ADMIN_SITE_URL || "https://retreat.tedditory.co";
+  const token = process.env.ADMIN_API_TOKEN;
+  if (!token) {
+    console.error("Set ADMIN_API_TOKEN in .env.local before running this.");
     process.exit(1);
   }
 
-  const listing = getListing(inquiry.listing_slug);
-  const amountCents = Math.round(amount * 100);
-
-  console.log(
-    `About to send a $${amount.toFixed(2)} payment link to ${inquiry.name} <${inquiry.email}> ` +
-      `for ${listing?.name ?? inquiry.listing_slug} (${inquiry.check_in} to ${inquiry.check_out}).`
-  );
-
-  const session = await createCheckoutSessionForInquiry(inquiry, amountCents);
-  if (!session.url) {
-    throw new Error("Stripe did not return a checkout URL.");
+  const res = await fetch(new URL("/api/admin/payment-link", siteUrl), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ ref, amount }),
+  });
+  const json = await res.json();
+  if (!res.ok || !json.ok) {
+    console.error(json.error || `Request failed (${res.status})`);
+    process.exit(1);
   }
 
-  await markAwaitingPayment(inquiry.id, {
-    stripeCheckoutSessionId: session.id,
-    amountCents,
-  });
-
-  await sendPaymentLinkEmail(inquiry, session.url, amountCents);
-
-  console.log(`Sent. Checkout URL: ${session.url}`);
+  console.log(`Sent $${amount.toFixed(2)} payment link to ${json.guest} <${json.email}>.`);
+  console.log(`Checkout URL: ${json.checkoutUrl}`);
 }
 
 main().catch((err) => {

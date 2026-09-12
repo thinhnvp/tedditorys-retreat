@@ -1,20 +1,26 @@
 import { getSql } from "./db";
 
 export type GuestProfile = {
+  /** Optional display name for the itinerary heading — distinct from the booking's formal name, e.g. for a demo. */
+  displayName?: string;
   partySize: number;
   hasRentalCar: boolean;
   /** Free-form interest tags collected from the intake form, e.g. "food", "nature", "nightlife". */
   preferences: string[];
   pace?: "relaxed" | "mixed" | "packed";
   notes?: string;
+  /** 3-5 human-written bullets explaining why this plan fits this guest specifically — shown as "Curated for". */
+  curatedFor: string[];
 };
+
+export type GeoPoint = { name: string; lat: number; lng: number };
 
 export type ItineraryActivity = {
   type: "activity";
   title: string;
   /** Free-form for now (e.g. "food", "nature", "landmark") — not yet used for filtering/map pins. */
   category: string;
-  location: string;
+  location: GeoPoint;
   /** 24-hour "HH:MM" local time. */
   fromTime: string;
   toTime: string;
@@ -23,8 +29,8 @@ export type ItineraryActivity = {
 
 export type ItineraryCommute = {
   type: "commute";
-  from: string;
-  to: string;
+  from: GeoPoint;
+  to: GeoPoint;
   by: string;
   fromTime: string;
   toTime: string;

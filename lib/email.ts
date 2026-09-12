@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import type { Inquiry } from "./db";
 import { getListing } from "./listings";
 import type { Quote } from "./pricing";
-import { renderInquiryConfirmationEmail } from "./email-templates";
+import { renderInquiryConfirmationEmail, renderHostNotificationEmail, type InquiryEmailData } from "./email-templates";
 
 let resend: Resend | null = null;
 
@@ -23,41 +23,15 @@ function formatMoney(cents: number): string {
   return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 }
 
-function money(n: number): string {
-  return `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-}
-
 export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise<void> {
   const listing = getListing(inquiry.listing_slug);
   const listingName = listing?.name ?? inquiry.listing_slug;
   const client = getResend();
 
-  await client.emails.send({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    replyTo: inquiry.email,
-    subject: `New inquiry: ${listingName} — ${inquiry.name}`,
-    text: [
-      `Reference: ${inquiry.reference_code}`,
-      `Listing: ${listingName}`,
-      `Name: ${inquiry.name}`,
-      `Email: ${inquiry.email}`,
-      `Phone: ${inquiry.phone}`,
-      `Dates: ${inquiry.check_in} to ${inquiry.check_out} (${quote.nights} nights)`,
-      `Guests: ${inquiry.guests}`,
-      `Quoted total: ${money(quote.total)} (monthly average ${money(quote.monthlyAverage)})`,
-      quote.discountApplied ? `Weekly discount applied — effective rate ${money(quote.nightlyRate)}/night` : null,
-      inquiry.message ? `Message: ${inquiry.message}` : null,
-      "",
-      "Reply to this email to reach the guest directly.",
-      `When you're ready to collect payment, tell Claude Code: "send a payment link for ${inquiry.reference_code}, $<amount>".`,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  });
-
-  const { html, text } = renderInquiryConfirmationEmail({
+  const emailData: InquiryEmailData = {
     guestName: inquiry.name,
+    guestEmail: inquiry.email,
+    guestPhone: inquiry.phone,
     listingName,
     checkIn: inquiry.check_in,
     checkOut: inquiry.check_out,
@@ -72,14 +46,26 @@ export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise
     // A "monthly average" doesn't mean anything for a capped-length stay.
     monthlyAverage: listing?.maxNights ? null : quote.monthlyAverage,
     referenceCode: inquiry.reference_code,
+    message: inquiry.message,
+  };
+
+  const host = renderHostNotificationEmail(emailData);
+  await client.emails.send({
+    from: FROM_EMAIL,
+    to: TO_EMAIL,
+    replyTo: inquiry.email,
+    subject: `New inquiry: ${listingName} — ${inquiry.name}`,
+    html: host.html,
+    text: host.text,
   });
 
+  const guest = renderInquiryConfirmationEmail(emailData);
   await client.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
     subject: `We got your inquiry for ${listingName}`,
-    html,
-    text,
+    html: guest.html,
+    text: guest.text,
   });
 }
 

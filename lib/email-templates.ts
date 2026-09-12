@@ -8,6 +8,8 @@ const COLORS = {
   line: "#D8D8DD",
   accent: "#3A6B57",
   cardAlt: "#F5F5F7",
+  cta: "#C9A227",
+  ctaText: "#3A2E00",
 };
 
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
@@ -154,8 +156,8 @@ function button(label: string, url: string): string {
       <td style="padding:20px 32px 4px 32px;">
         <table role="presentation" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="border-radius:12px;background:${COLORS.accent};">
-              <a href="${url}" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#FFFFFF;font-family:${FONT};text-decoration:none;border-radius:12px;">${label}</a>
+            <td style="border-radius:12px;background:${COLORS.cta};">
+              <a href="${url}" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:${COLORS.ctaText};font-family:${FONT};text-decoration:none;border-radius:12px;">${label}</a>
             </td>
           </tr>
         </table>

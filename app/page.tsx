@@ -78,7 +78,7 @@ export default function HomePage() {
         <div className="wrap">
           <div className="sec-head reveal">
             <div className="eyebrow">The Rooms</div>
-            <h2>Four rooms. Each its own kind of quiet.</h2>
+            <h2>Three rooms. Each its own kind of quiet.</h2>
             <p>Every room is a private bedroom with its own bathroom. Tap through for details, rates, and to reach out directly.</p>
           </div>
           <div className="roomgrid">

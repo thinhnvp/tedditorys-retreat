@@ -182,13 +182,13 @@ export const LISTINGS: Listing[] = [
     weeklyDiscountPercent: 12,
     weeklyDiscountMinNights: 7,
     cardFeature:
-      "A curated, fully hosted hideaway in Renton — door-to-door arrival coordination, a personalized day-by-day itinerary, and Wine & Music Night included. Arranged individually, by inquiry only.",
+      "A fully hosted stay in Renton, arranged around you — door-to-door arrival coordination, days planned around what you actually want, and an evening of wine and music along the way. By inquiry only.",
     description:
-      "A private, fully hosted hideaway in Renton — less a room rental than a curated escape. Every stay includes door-to-door arrival coordination, a personalized day-by-day itinerary built around what you actually want to see, and Wine & Music Night, a relaxed evening with wine and good music. Because each stay is arranged individually, availability is by inquiry only.",
+      "The Elysian Escape isn't really a room you book — it's a stay someone plans for you. Arrival is coordinated door-to-door, so you're not left figuring out a rideshare on no sleep. From there, your days get built around what you're actually here for — a specific list of restaurants, a slower pace, or just better recommendations than a search engine gives you. Most stays end up with an evening of wine and music that's turned into something of a house tradition. Because every stay is arranged this way, dates are confirmed by request rather than instant booking.",
     curatedExperience: [
       "Door-to-door arrival coordination",
-      "A personalized, day-by-day itinerary",
-      "Wine & Music Night — a relaxed evening with wine and good music",
+      "Your days planned around what you're actually here for",
+      "An evening of wine and music that's become a house tradition",
     ],
     amenities: [
       "Private bathroom",
@@ -203,9 +203,9 @@ export const LISTINGS: Listing[] = [
       "Workspace",
     ],
     neighborhood:
-      "A quiet residential pocket of Windsor Hills, with a small local green space nearby for a walk or fresh air. The Landing (Target, dining, entertainment) is 5 minutes by car, with freeway access to Bellevue (15 min) and Tukwila (10 min).",
+      "Windsor Hills is a quiet, residential corner of Renton, with a small neighborhood green space nearby if you want fresh air without driving. The Landing — Target, Regal Cinemas, and a solid lineup of Korean BBQ, sushi, and poke — is five minutes by car, and the freeway puts Bellevue fifteen minutes out, Tukwila ten.",
     reviews: "5.0★ (2 reviews) · Superhost",
-    chips: ["Hosted experience", "Airport pickup", "Curated tour", "Inquiry only"],
+    chips: ["Hosted experience", "Door-to-door arrival", "Personalized itinerary", "Inquiry only"],
     houseRules: [
       "No smoking inside the property or common areas",
       "No pets — other residents have allergies",

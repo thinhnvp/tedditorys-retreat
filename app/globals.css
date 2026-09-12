@@ -117,9 +117,6 @@ a{color:inherit;text-decoration:none}
 .howcard .n{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.04em}
 .howcard h4{margin-top:12px;font-size:19px;letter-spacing:-.01em}
 .howcard p{margin-top:8px;color:var(--muted);font-size:14.5px;line-height:1.55}
-.longstay{margin-top:34px;background:var(--bg-alt);border:1px solid var(--line);border-radius:18px;padding:28px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.longstay p{font-size:16px;letter-spacing:-.01em}
-.longstay span{color:var(--muted);display:block;font-size:14px;margin-top:4px}
 
 /* ---------- FEATURE (The Elysian Escape) ---------- */
 .feature{background:var(--ink)}
@@ -128,7 +125,6 @@ a{color:inherit;text-decoration:none}
 .feature-body{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
 .feature-tag{align-self:flex-start;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#8A6D1D;background:rgba(201,162,39,.14);border:1px solid rgba(201,162,39,.35);padding:6px 12px;border-radius:980px;margin-bottom:18px}
 .feature-body h2{font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;font-weight:600}
-.feature-tagline{margin-top:6px;font-size:17px;font-style:italic;color:var(--ink);letter-spacing:-.01em}
 .feature-sub{margin-top:6px;color:var(--muted);font-size:14.5px}
 .feature-desc{margin-top:20px;color:var(--muted);font-size:15.5px;line-height:1.6}
 .feature-list{margin:22px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
@@ -175,7 +171,6 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 48px
 .listing-tagline{margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
 .listing-header h1{margin-top:10px;font-size:clamp(32px,4.6vw,50px);letter-spacing:-.03em;font-weight:600;line-height:1.05}
 .listing-header h1:first-child{margin-top:18px}
-.hero-tagline{margin-top:12px;font-size:20px;font-style:italic;color:var(--ink);letter-spacing:-.01em}
 .hero-capacity{margin-top:8px;font-size:14.5px;color:var(--muted)}
 
 .gallery{margin-top:36px;border-radius:22px;overflow:hidden;background:var(--bg-alt);aspect-ratio:16/9;position:relative}

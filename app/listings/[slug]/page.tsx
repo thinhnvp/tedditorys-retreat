@@ -60,13 +60,10 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
           </div>
           {listing.tagline && <div className="listing-tagline">{listing.tagline}</div>}
           <h1>{listing.name}</h1>
-          {listing.experienceTagline && (
-            <>
-              <p className="hero-tagline">{listing.experienceTagline}</p>
-              <p className="hero-capacity">
-                Private stay for 1–{listing.maxGuests} guest{listing.maxGuests === 1 ? "" : "s"}.
-              </p>
-            </>
+          {listing.experienceHighlights && (
+            <p className="hero-capacity">
+              Private stay for 1–{listing.maxGuests} guest{listing.maxGuests === 1 ? "" : "s"}.
+            </p>
           )}
 
           <div className="gallery reveal">

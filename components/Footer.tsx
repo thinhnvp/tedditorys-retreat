@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { LISTINGS } from "@/lib/listings";
 
+const rooms = LISTINGS.filter((listing) => !listing.experienceHighlights);
+const hostedExperiences = LISTINGS.filter((listing) => listing.experienceHighlights);
+
 export default function Footer() {
   return (
     <footer id="contact">
@@ -12,7 +15,15 @@ export default function Footer() {
           </div>
           <div className="footcol">
             <h5>Rooms</h5>
-            {LISTINGS.map((listing) => (
+            {rooms.map((listing) => (
+              <Link key={listing.slug} href={`/listings/${listing.slug}`}>
+                {listing.name}
+              </Link>
+            ))}
+          </div>
+          <div className="footcol">
+            <h5>Hosted Hideaway</h5>
+            {hostedExperiences.map((listing) => (
               <Link key={listing.slug} href={`/listings/${listing.slug}`}>
                 {listing.name}
               </Link>

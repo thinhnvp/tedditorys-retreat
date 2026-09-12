@@ -141,13 +141,6 @@ export default function HomePage() {
               <p>When it&apos;s time to move on, a month&apos;s notice is all it takes.</p>
             </div>
           </div>
-          <div className="longstay reveal">
-            <p>
-              Planning to stay six months or more?
-              <span>Reach out on any room&apos;s page and we&apos;ll talk through a custom arrangement that fits.</span>
-            </p>
-            <Link className="btn btn-primary" href="#rooms">Explore rooms</Link>
-          </div>
         </div>
       </section>
 
@@ -166,7 +159,6 @@ export default function HomePage() {
             <div className="feature-body">
               <span className="feature-tag">{hideaway.tagline}</span>
               <h2>{hideaway.name}</h2>
-              {hideaway.experienceTagline && <p className="feature-tagline">{hideaway.experienceTagline}</p>}
               <p className="feature-sub">{hideaway.location}</p>
               <p className="feature-desc">{hideaway.description}</p>
               {hideaway.experienceHighlights && (

@@ -98,7 +98,7 @@ export default function BookingSection({ listing }: { listing: Listing }) {
   return (
     <>
       <div className="listing-body reveal">
-        {listing.experienceTagline ? (
+        {listing.experienceHighlights ? (
           <p className="listing-promise">{listing.description}</p>
         ) : (
           <>
@@ -138,7 +138,7 @@ export default function BookingSection({ listing }: { listing: Listing }) {
           </>
         )}
 
-        <h2 className="h-sm">{listing.experienceTagline ? "Your room" : "What this place offers"}</h2>
+        <h2 className="h-sm">{listing.experienceHighlights ? "Amenities" : "What this place offers"}</h2>
         <ul className="amenity-grid">
           {listing.amenities.map((a) => (
             <li key={a}>{a}</li>

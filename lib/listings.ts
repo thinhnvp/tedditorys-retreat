@@ -41,13 +41,11 @@ export type Listing = {
   weeklyDiscountMinNights?: number;
 
   /**
-   * Hero subtitle for hosted-experience listings (e.g. "Seattle, curated for
-   * you."). Presence of this field marks the listing as an "experience"
+   * Rich "what's included" cards — replaces a flat bullet list for experience
+   * listings. Presence of this field marks the listing as an "experience"
    * product and switches on the richer page sections below — other listings
    * stay on the plain room-rental layout.
    */
-  experienceTagline?: string;
-  /** Rich "what's included" cards — replaces a flat bullet list for experience listings. */
   experienceHighlights?: ExperienceHighlight[];
   /** Numbered "how your stay works" steps, shown only for experience listings. */
   howItWorks?: StayStep[];
@@ -202,11 +200,10 @@ export const LISTINGS: Listing[] = [
     maxNights: 13,
     weeklyDiscountPercent: 12,
     weeklyDiscountMinNights: 7,
-    experienceTagline: "Seattle, curated for you.",
     cardFeature:
       "A fully hosted stay in Renton, arranged around you — coordinated arrival, a personal Seattle plan, and an evening that's become a house tradition. By inquiry only.",
     description:
-      "The Elysian Escape isn't really a room you book — it's a stay someone plans for you. Arrival is coordinated, your days are shaped around what you actually want, and one evening usually turns into wine, music, and something of a house tradition. Because every stay is arranged this way, dates are confirmed by request rather than instant booking.",
+      "The Elysian Escape isn't really a room you book — it's a stay someone plans for you. Arrival is coordinated, your days are shaped around what you actually want, and one evening usually turns into wine, music, and something of a house tradition.",
     experienceHighlights: [
       {
         title: "Arrival, handled",
@@ -216,7 +213,7 @@ export const LISTINGS: Listing[] = [
       {
         title: "A Seattle plan made for you",
         description:
-          "Tell us what you like — food, neighborhoods, nature, nightlife, quiet days, tech, photography, or something else. A personal Seattle itinerary is waiting when you arrive: follow it completely, steal a few ideas, or change course entirely.",
+          "Tell us what you like, and a personal Seattle itinerary is waiting when you arrive — follow it, tweak it, or ignore it entirely.",
       },
       {
         title: "The Elysian evening",

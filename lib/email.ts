@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import type { Inquiry } from "./db";
 import { getListing } from "./listings";
 import type { Quote } from "./pricing";
+import { renderInquiryConfirmationEmail } from "./email-templates";
 
 let resend: Resend | null = null;
 
@@ -55,21 +56,26 @@ export async function sendInquiryEmails(inquiry: Inquiry, quote: Quote): Promise
       .join("\n"),
   });
 
+  const { html, text } = renderInquiryConfirmationEmail({
+    guestName: inquiry.name,
+    listingName,
+    checkIn: inquiry.check_in,
+    checkOut: inquiry.check_out,
+    guests: inquiry.guests,
+    checkInTime: listing?.checkInTime ?? "3:00 PM",
+    checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    total: quote.total,
+    // A "monthly average" doesn't mean anything for a capped-length stay.
+    monthlyAverage: listing?.maxNights ? null : quote.monthlyAverage,
+    referenceCode: inquiry.reference_code,
+  });
+
   await client.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
     subject: `We got your inquiry for ${listingName}`,
-    text: [
-      `Hi ${inquiry.name},`,
-      "",
-      `Thanks for reaching out about ${listingName} (${inquiry.check_in} to ${inquiry.check_out}, ${inquiry.guests} guest(s)).`,
-      `Your quote: ${money(quote.total)} total (${money(quote.monthlyAverage)}/mo average).`,
-      "Our team will follow up with you directly soon.",
-      "",
-      `Your reference number is ${inquiry.reference_code}.`,
-      "",
-      "— Tedditory Retreat",
-    ].join("\n"),
+    html,
+    text,
   });
 }
 

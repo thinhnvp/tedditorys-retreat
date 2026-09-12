@@ -2,7 +2,15 @@ import { Resend } from "resend";
 import type { Inquiry } from "./db";
 import { getListing } from "./listings";
 import type { Quote } from "./pricing";
-import { renderInquiryEmail, inquirySubject, type InquiryEmailData } from "./email-templates";
+import {
+  renderInquiryEmail,
+  inquirySubject,
+  renderPaymentLinkEmail,
+  renderPaymentReceivedEmail,
+  type InquiryEmailData,
+  type PaymentLinkEmailData,
+  type PaymentReceivedEmailData,
+} from "./email-templates";
 
 let resend: Resend | null = null;
 
@@ -18,10 +26,6 @@ function getResend(): Resend {
 
 const FROM_EMAIL = process.env.FROM_EMAIL || "Tedditory Retreat <onboarding@resend.dev>";
 const TO_EMAIL = process.env.TO_EMAIL || "ted@tedditory.co";
-
-function formatMoney(cents: number): string {
-  return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
-}
 
 function toEmailData(inquiry: Inquiry, quote: Quote): InquiryEmailData {
   const listing = getListing(inquiry.listing_slug);
@@ -76,26 +80,35 @@ export async function sendPaymentLinkEmail(
   const listingName = listing?.name ?? inquiry.listing_slug;
   const client = getResend();
 
+  const data: PaymentLinkEmailData = {
+    guestName: inquiry.name,
+    listingName,
+    checkIn: inquiry.check_in,
+    checkOut: inquiry.check_out,
+    checkInTime: listing?.checkInTime ?? "3:00 PM",
+    checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    amountCents,
+    checkoutUrl,
+    referenceCode: inquiry.reference_code,
+  };
+  const { html, text } = renderPaymentLinkEmail(data);
+
   await client.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
     cc: TO_EMAIL,
     subject: `Re: ${inquirySubject({ listingName, referenceCode: inquiry.reference_code })}`,
-    text: [
-      `Hi ${inquiry.name},`,
-      "",
-      `Here's a secure link to complete payment and lock in ${listingName} for ${inquiry.check_in} to ${inquiry.check_out}:`,
-      checkoutUrl,
-      "",
-      `Amount due: ${formatMoney(amountCents)}`,
-      "",
-      `Reference: ${inquiry.reference_code}`,
-      "",
-      "— Tedditory Retreat",
-    ].join("\n"),
+    html,
+    text,
   });
 }
 
+/**
+ * Sent once the webhook confirms payment. Guest is the primary recipient
+ * (host CC'd), same as the inquiry and payment-link emails, so the whole
+ * conversation — automated and manually-typed replies alike — stays in one
+ * reply-all thread.
+ */
 export async function sendPaymentReceivedEmail(
   inquiry: Inquiry,
   amountCents: number | null
@@ -104,18 +117,38 @@ export async function sendPaymentReceivedEmail(
   const listingName = listing?.name ?? inquiry.listing_slug;
   const client = getResend();
 
+  const data: PaymentReceivedEmailData = {
+    guestName: inquiry.name,
+    listingName,
+    checkIn: inquiry.check_in,
+    checkOut: inquiry.check_out,
+    checkInTime: listing?.checkInTime ?? "3:00 PM",
+    checkOutTime: listing?.checkOutTime ?? "11:00 AM",
+    amountCents: amountCents ?? inquiry.amount_cents ?? 0,
+    referenceCode: inquiry.reference_code,
+  };
+  const { html, text } = renderPaymentReceivedEmail(data);
+
+  await client.emails.send({
+    from: FROM_EMAIL,
+    to: inquiry.email,
+    cc: TO_EMAIL,
+    subject: `Re: ${inquirySubject({ listingName, referenceCode: inquiry.reference_code })} — Payment received`,
+    html,
+    text,
+  });
+}
+
+/** Internal, host-only alert — a delayed payment method failed to clear. */
+export async function sendPaymentFailedNotice(referenceCode: string): Promise<void> {
+  const client = getResend();
   await client.emails.send({
     from: FROM_EMAIL,
     to: TO_EMAIL,
-    subject: `Re: ${inquirySubject({ listingName, referenceCode: inquiry.reference_code })} — Payment received`,
+    subject: `Action needed — payment failed (ref ${referenceCode})`,
     text: [
-      `Reference: ${inquiry.reference_code}`,
-      `Listing: ${listingName}`,
-      `Guest: ${inquiry.name} (${inquiry.email}, ${inquiry.phone})`,
-      `Dates: ${inquiry.check_in} to ${inquiry.check_out}`,
-      amountCents ? `Amount paid: ${formatMoney(amountCents)}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n"),
+      `The payment attempt for inquiry ${referenceCode} did not clear.`,
+      "That checkout link is now unusable — send a new one if the guest still wants to book.",
+    ].join("\n"),
   });
 }

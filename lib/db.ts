@@ -139,6 +139,13 @@ export async function markAwaitingPayment(
   `;
 }
 
+/**
+ * The `status != 'paid'` guard makes this idempotent: Stripe retries
+ * webhook deliveries, and a session can also fire both
+ * checkout.session.completed and checkout.session.async_payment_succeeded.
+ * Without the guard, a second call would re-stamp paid_at and the caller
+ * would send a duplicate "payment received" email.
+ */
 export async function markPaidByCheckoutSession(
   stripeCheckoutSessionId: string,
   data: { stripePaymentIntentId: string | null }
@@ -151,6 +158,7 @@ export async function markPaidByCheckoutSession(
         paid_at = now(),
         updated_at = now()
     WHERE stripe_checkout_session_id = ${stripeCheckoutSessionId}
+      AND status != 'paid'
     RETURNING *
   `) as Inquiry[];
   return rows[0] ? normalizeInquiry(rows[0]) : null;

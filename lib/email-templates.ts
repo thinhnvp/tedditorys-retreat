@@ -143,6 +143,21 @@ function breakdownRows(data: InquiryEmailData): string[] {
   ];
 }
 
+function button(label: string, url: string): string {
+  return `
+    <tr>
+      <td style="padding:20px 32px 4px 32px;">
+        <table role="presentation" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="border-radius:12px;background:${COLORS.accent};">
+              <a href="${url}" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#FFFFFF;font-family:${FONT};text-decoration:none;border-radius:12px;">${label}</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+}
+
 /**
  * The single email sent for a new inquiry — the guest is the primary
  * recipient and the host is CC'd (see sendInquiryEmails), so this content
@@ -225,6 +240,132 @@ export function renderInquiryEmail(data: InquiryEmailData): { html: string; text
   ]
     .filter((line) => line !== null)
     .join("\n");
+
+  return { html, text };
+}
+
+export type PaymentLinkEmailData = {
+  guestName: string;
+  listingName: string;
+  checkIn: string;
+  checkOut: string;
+  checkInTime: string;
+  checkOutTime: string;
+  amountCents: number;
+  checkoutUrl: string;
+  referenceCode: string;
+};
+
+/** Sent to the guest (host CC'd) once the host has agreed on a final amount. */
+export function renderPaymentLinkEmail(data: PaymentLinkEmailData): { html: string; text: string } {
+  const amount = money(data.amountCents / 100);
+  const card = renderDetailsCard([
+    [
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
+    ],
+    [row("Amount due", amount, { strong: true })],
+  ]);
+
+  const body = [
+    paragraph(`Hi ${data.guestName},`, { size: 16, emphasis: true }),
+    paragraph(
+      `Here&rsquo;s a secure link to complete payment and lock in <strong style="color:${COLORS.ink};">${data.listingName}</strong>:`,
+      { padBottom: 24 }
+    ),
+    `<tr><td style="padding:0 32px;">${card}</td></tr>`,
+    button("Pay now", data.checkoutUrl),
+    paragraph("Payment is handled securely by Stripe.", { padTop: 12, size: 13 }),
+    paragraph(`Reference: <strong style="color:${COLORS.ink};">${data.referenceCode}</strong>`, {
+      padTop: 8,
+      padBottom: 24,
+      size: 13,
+    }),
+  ].join("");
+
+  const html = renderShell({
+    preheader: `Complete payment for ${data.listingName} — reference ${data.referenceCode}.`,
+    body,
+  });
+
+  const text = [
+    `Hi ${data.guestName},`,
+    "",
+    `Here's a secure link to complete payment and lock in ${data.listingName}:`,
+    "",
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
+    `Amount due: ${amount}`,
+    "",
+    data.checkoutUrl,
+    "",
+    "Payment is handled securely by Stripe.",
+    "",
+    `Reference: ${data.referenceCode}`,
+    "",
+    "— Tedditory Retreat",
+  ].join("\n");
+
+  return { html, text };
+}
+
+export type PaymentReceivedEmailData = {
+  guestName: string;
+  listingName: string;
+  checkIn: string;
+  checkOut: string;
+  checkInTime: string;
+  checkOutTime: string;
+  amountCents: number;
+  referenceCode: string;
+};
+
+/** Sent to the guest (host CC'd) once Stripe confirms the payment cleared. */
+export function renderPaymentReceivedEmail(data: PaymentReceivedEmailData): { html: string; text: string } {
+  const amount = money(data.amountCents / 100);
+  const card = renderDetailsCard([
+    [
+      row("Check-in", `${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`),
+      row("Check-out", `${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`),
+    ],
+    [row("Amount paid", amount, { strong: true })],
+  ]);
+
+  const body = [
+    paragraph(`Hi ${data.guestName},`, { size: 16, emphasis: true }),
+    paragraph(
+      `Payment received &mdash; you&rsquo;re all set for <strong style="color:${COLORS.ink};">${data.listingName}</strong>.`,
+      { padBottom: 24 }
+    ),
+    `<tr><td style="padding:0 32px;">${card}</td></tr>`,
+    paragraph("We&rsquo;ll follow up right here with anything else you need before check-in."),
+    paragraph(`Reference: <strong style="color:${COLORS.ink};">${data.referenceCode}</strong>`, {
+      padTop: 8,
+      padBottom: 24,
+      size: 13,
+    }),
+  ].join("");
+
+  const html = renderShell({
+    preheader: `Payment received for ${data.listingName} — reference ${data.referenceCode}.`,
+    body,
+  });
+
+  const text = [
+    `Hi ${data.guestName},`,
+    "",
+    `Payment received — you're all set for ${data.listingName}.`,
+    "",
+    `Check-in: ${formatFriendlyDate(data.checkIn)} · ${data.checkInTime} Pacific Time`,
+    `Check-out: ${formatFriendlyDate(data.checkOut)} · ${data.checkOutTime} Pacific Time`,
+    `Amount paid: ${amount}`,
+    "",
+    "We'll follow up right here with anything else you need before check-in.",
+    "",
+    `Reference: ${data.referenceCode}`,
+    "",
+    "— Tedditory Retreat",
+  ].join("\n");
 
   return { html, text };
 }

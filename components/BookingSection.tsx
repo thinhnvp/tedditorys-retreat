@@ -239,10 +239,12 @@ export default function BookingSection({ listing }: { listing: Listing }) {
               </span>
               <strong>{money(quote.total)}</strong>
             </div>
-            <div className="total-row secondary">
-              <span>Monthly average</span>
-              <strong>{money(quote.monthlyAverage)}</strong>
-            </div>
+            {!listing.maxNights && (
+              <div className="total-row secondary">
+                <span>Monthly average</span>
+                <strong>{money(quote.monthlyAverage)}</strong>
+              </div>
+            )}
             <details>
               <summary>Show breakdown</summary>
               {quote.discountApplied && (

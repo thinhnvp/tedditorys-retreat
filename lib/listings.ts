@@ -182,13 +182,13 @@ export const LISTINGS: Listing[] = [
     weeklyDiscountPercent: 12,
     weeklyDiscountMinNights: 7,
     cardFeature:
-      "A curated, fully hosted hideaway in Renton — airport pickup, a personalized Seattle tour, and a karaoke night with wine included. Arranged individually, by inquiry only.",
+      "A curated, fully hosted hideaway in Renton — door-to-door arrival coordination, Ted's Seattle (a personalized day-by-day itinerary), and Wine & Sing Night included. Arranged individually, by inquiry only.",
     description:
-      "A private, fully hosted hideaway near Lake Washington — less a room rental than a curated escape. Every stay includes airport pickup and drop-off, a Seattle tour planned around what you actually want to see, and one karaoke night with wine included. Because each stay is arranged individually, availability is by inquiry only.",
+      "A private, fully hosted hideaway near Lake Washington — less a room rental than a curated escape. Every stay includes door-to-door arrival coordination, Ted's Seattle — a personalized day-by-day itinerary built around what you actually want to see — and Wine & Sing Night, an evening of wine and karaoke. Because each stay is arranged individually, availability is by inquiry only.",
     curatedExperience: [
-      "Airport pickup and drop-off",
-      "A curated Seattle tour, planned around your preferences",
-      "One karaoke night with wine included",
+      "Door-to-door arrival coordination",
+      "Ted's Seattle — a personalized day-by-day itinerary",
+      "Wine & Sing Night — an evening of wine and karaoke",
     ],
     amenities: [
       "Private bathroom",

@@ -47,13 +47,16 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
   }, [day.items]);
 
   function handleSelect(i: number) {
+    // The clicked item is already on screen (that's how it got clicked), so
+    // no need to scroll it into place — just guard against a stray observer
+    // callback (already queued from whatever scroll got it into view)
+    // landing right after and overriding the click.
     setActiveIndex(i);
     suppressObserverRef.current = true;
-    itemRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" });
     if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current);
     suppressTimeoutRef.current = setTimeout(() => {
       suppressObserverRef.current = false;
-    }, 700);
+    }, 400);
   }
 
   return (

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ItineraryDay as ItineraryDayType, GeoPoint } from "@/lib/itineraries";
 import ItineraryDayMap from "./ItineraryDayMap";
-import { formatFriendlyDate } from "@/lib/format";
 
 export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -60,11 +59,8 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
   }
 
   return (
-    <div className="itinerary-day reveal">
-      <div className="itinerary-day-head">
-        <div className="itinerary-date">{formatFriendlyDate(day.date)}</div>
-        {day.title && <h3>{day.title}</h3>}
-      </div>
+    <div className="itinerary-day">
+      {day.title && <h3 className="itinerary-day-title">{day.title}</h3>}
 
       <div className="itinerary-day-grid">
         <ol className="itinerary-items">
@@ -78,8 +74,7 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
               onClick={() => handleSelect(i)}
             >
               <span className="itinerary-time">
-                {item.fromTime}
-                <span className="to">→ {item.toTime}</span>
+                {item.fromTime}–{item.toTime}
               </span>
               <div className="itinerary-body">
                 {item.type === "commute" ? (

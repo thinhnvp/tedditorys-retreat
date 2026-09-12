@@ -31,8 +31,11 @@ export default function ItineraryDayMap({ points, activeIndex }: { points: GeoPo
       if (cancelled || !containerRef.current || mapRef.current) return;
 
       const map = L.map(containerRef.current, { scrollWheelZoom: false, attributionControl: false });
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
+      // CartoDB Positron — a light, minimal basemap (muted greys, no
+      // clutter of POIs/road shields) that reads much cleaner than the
+      // default OSM tiles at this size.
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution: "© OpenStreetMap contributors © CARTO",
         maxZoom: 19,
       }).addTo(map);
       L.control.attribution({ prefix: false, position: "bottomright" }).addTo(map);

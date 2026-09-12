@@ -9,8 +9,6 @@ export type GuestProfile = {
   preferences: string[];
   pace?: "relaxed" | "mixed" | "packed";
   notes?: string;
-  /** 3-5 human-written bullets explaining why this plan fits this guest specifically — shown as "Curated for". */
-  curatedFor: string[];
 };
 
 export type GeoPoint = { name: string; lat: number; lng: number };

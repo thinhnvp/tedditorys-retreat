@@ -38,12 +38,6 @@ const guestProfile: GuestProfile = {
   preferences: ["food", "waterfront", "coffee", "quiet neighborhoods", "a little nightlife"],
   pace: "mixed",
   notes: "First time in Seattle, staying solo — wants a mix of food and low-key exploring, open to one livelier night out.",
-  curatedFor: [
-    "Traveling solo, so the week leans toward good coffee and walkable neighborhoods rather than group-sized activities",
-    "No rental car — every day is built around rideshare, ferry, and clusters of stops you can cover on foot once you're there",
-    "Food and waterfront over landmark-checklist tourism, with one livelier night worked in for balance",
-    "A mixed pace — a couple of full days, and a couple of deliberately light ones so the week doesn't feel like a itinerary to survive",
-  ],
 };
 
 const days: ItineraryDay[] = [

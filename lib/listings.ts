@@ -164,7 +164,7 @@ export const LISTINGS: Listing[] = [
   {
     slug: "elysian-escape",
     name: "The Elysian Escape",
-    location: "Renton · Lake Washington",
+    location: "Renton · Windsor Hills",
     airbnbUrl: "https://www.airbnb.com/rooms/1372127017588541267",
     heroImage: "/assets/images/container02.jpg",
     heroAlt: "The Elysian Escape, a private hosted hideaway in Renton with attached bath",
@@ -182,13 +182,13 @@ export const LISTINGS: Listing[] = [
     weeklyDiscountPercent: 12,
     weeklyDiscountMinNights: 7,
     cardFeature:
-      "A curated, fully hosted hideaway in Renton — door-to-door arrival coordination, a personalized day-by-day itinerary, and Wine & Sing Night included. Arranged individually, by inquiry only.",
+      "A curated, fully hosted hideaway in Renton — door-to-door arrival coordination, a personalized day-by-day itinerary, and Wine & Music Night included. Arranged individually, by inquiry only.",
     description:
-      "A private, fully hosted hideaway near Lake Washington — less a room rental than a curated escape. Every stay includes door-to-door arrival coordination, a personalized day-by-day itinerary built around what you actually want to see, and Wine & Sing Night, an evening of wine and karaoke. Because each stay is arranged individually, availability is by inquiry only.",
+      "A private, fully hosted hideaway in Renton — less a room rental than a curated escape. Every stay includes door-to-door arrival coordination, a personalized day-by-day itinerary built around what you actually want to see, and Wine & Music Night, a relaxed evening with wine and good music. Because each stay is arranged individually, availability is by inquiry only.",
     curatedExperience: [
       "Door-to-door arrival coordination",
       "A personalized, day-by-day itinerary",
-      "Wine & Sing Night — an evening of wine and karaoke",
+      "Wine & Music Night — a relaxed evening with wine and good music",
     ],
     amenities: [
       "Private bathroom",
@@ -203,7 +203,7 @@ export const LISTINGS: Listing[] = [
       "Workspace",
     ],
     neighborhood:
-      "Windsor Hills, a 10-minute walk to Windsor Hills Park. The Landing (Target, dining, entertainment) is 5 minutes by car, with freeway access to Bellevue (15 min) and Tukwila (10 min).",
+      "A quiet residential pocket of Windsor Hills, with a small local green space nearby for a walk or fresh air. The Landing (Target, dining, entertainment) is 5 minutes by car, with freeway access to Bellevue (15 min) and Tukwila (10 min).",
     reviews: "5.0★ (2 reviews) · Superhost",
     chips: ["Hosted experience", "Airport pickup", "Curated tour", "Inquiry only"],
     houseRules: [

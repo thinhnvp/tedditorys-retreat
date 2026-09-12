@@ -1,10 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import RoomCard from "@/components/RoomCard";
 import Model3D from "@/components/Model3D";
 import RevealSetup from "@/components/RevealSetup";
-import { LISTINGS } from "@/lib/listings";
+import { LISTINGS, getListing } from "@/lib/listings";
+
+// The Elysian Escape is a separate, fully hosted experience — not part of
+// the monthly room-share lineup — so it gets its own featured section
+// below rather than sitting in the room grid.
+const roomListings = LISTINGS.filter((listing) => listing.slug !== "elysian-escape");
+const hideaway = getListing("elysian-escape")!;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -75,7 +82,7 @@ export default function HomePage() {
             <p>Every room is a private bedroom with its own bathroom. Tap through for details, rates, and to reach out directly.</p>
           </div>
           <div className="roomgrid">
-            {LISTINGS.map((listing) => (
+            {roomListings.map((listing) => (
               <RoomCard key={listing.slug} listing={listing} />
             ))}
           </div>
@@ -140,6 +147,38 @@ export default function HomePage() {
               <span>Reach out on any room&apos;s page and we&apos;ll talk through a custom arrangement that fits.</span>
             </p>
             <Link className="btn btn-primary" href="#rooms">Explore rooms</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="sec feature" id="hideaway">
+        <div className="wrap">
+          <div className="feature-card reveal">
+            <div className="feature-media">
+              <Image
+                src={hideaway.heroImage}
+                alt={hideaway.heroAlt}
+                fill
+                sizes="(max-width: 900px) 100vw, 50vw"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+            <div className="feature-body">
+              <span className="feature-tag">{hideaway.tagline}</span>
+              <h2>{hideaway.name}</h2>
+              <p className="feature-sub">{hideaway.location}</p>
+              <p className="feature-desc">{hideaway.description}</p>
+              {hideaway.curatedExperience && (
+                <ul className="feature-list">
+                  {hideaway.curatedExperience.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              <Link className="btn btn-gold" href={`/listings/${hideaway.slug}`}>
+                Explore the Hideaway
+              </Link>
+            </div>
           </div>
         </div>
       </section>

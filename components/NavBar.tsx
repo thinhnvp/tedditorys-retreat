@@ -37,6 +37,7 @@ export default function NavBar() {
           <Link href="/#rooms" onClick={close}>Rooms</Link>
           <Link href="/#why" onClick={close}>Why</Link>
           <Link href="/#how" onClick={close}>Staying here</Link>
+          <Link href="/#hideaway" onClick={close}>Hideaway</Link>
           <a
             className="cta"
             href="https://www.airbnb.com/users/show/116747850"

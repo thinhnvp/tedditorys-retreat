@@ -69,6 +69,22 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
           <div className="gallery reveal">
             <Image src={listing.heroImage} alt={listing.heroAlt} fill sizes="100vw" style={{ objectFit: "cover" }} priority />
           </div>
+
+          {listing.gallery.length > 1 && (
+            <div className="gallery-grid reveal">
+              {listing.gallery.slice(1).map((src, i) => (
+                <div className="gallery-thumb" key={src}>
+                  <Image
+                    src={src}
+                    alt={`${listing.name} — photo ${i + 2}`}
+                    fill
+                    sizes="(max-width: 760px) 50vw, 25vw"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

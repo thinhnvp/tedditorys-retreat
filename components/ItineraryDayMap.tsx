@@ -71,6 +71,18 @@ export default function ItineraryDayMap({
         })
       );
 
+      // If the initially-active item is a commute, its highlight needs
+      // creating here too — the effect below that normally handles this
+      // runs before this async map setup finishes, so on first load it
+      // sees no map yet and never gets a second chance (activeIndex/
+      // focusPoints don't change again on their own).
+      if (focusPoints.length === 2) {
+        highlightRef.current = L.polyline(
+          focusPoints.map((p) => [p.lat, p.lng] as [number, number]),
+          { color: ACCENT, weight: 4, opacity: 0.9, lineCap: "round" }
+        ).addTo(map);
+      }
+
       const boundsSource = defaultBoundsPoints.length > 0 ? defaultBoundsPoints : points;
       const boundsLatLngs = boundsSource.map((p) => [p.lat, p.lng] as [number, number]);
       if (boundsLatLngs.length > 1) {

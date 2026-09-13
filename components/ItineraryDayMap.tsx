@@ -5,16 +5,17 @@ import { useEffect, useRef } from "react";
 import type { GeoPoint } from "@/lib/itineraries";
 
 const ACCENT = "#3A6B57";
-const MUTED = "#B9C4BE";
+const MUTED = "#7D9088";
 const FOCUS_ZOOM = 15;
 
 function dotIcon(L: typeof import("leaflet"), active: boolean) {
-  const size = active ? 18 : 11;
+  const size = active ? 26 : 16;
+  const border = active ? 3 : 2;
   return L.divIcon({
     className: "itinerary-pin",
     html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;background:${
       active ? ACCENT : "#fff"
-    };border:2px solid ${active ? ACCENT : MUTED};box-shadow:0 1px 4px rgba(0,0,0,.25);"></span>`,
+    };border:${border}px solid ${active ? ACCENT : MUTED};box-shadow:0 2px 6px rgba(0,0,0,.3);"></span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });

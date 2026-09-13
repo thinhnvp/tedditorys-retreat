@@ -35,7 +35,7 @@ export default async function ItineraryPage({ params }: { params: Promise<{ ref:
             {formatFriendlyDate(inquiry.check_out)}
           </p>
 
-          <div className="profile-kv reveal">
+          <div className="profile-kv">
             <div className="profile-kv-row">
               <span className="profile-kv-label">Plan for</span>
               <span className="profile-kv-value">

@@ -31,13 +31,17 @@ export default function ItineraryDayMap({ points, activeIndex }: { points: GeoPo
       if (cancelled || !containerRef.current || mapRef.current) return;
 
       const map = L.map(containerRef.current, { scrollWheelZoom: false, attributionControl: false });
-      // CartoDB Positron — a light, minimal basemap (muted greys, no
-      // clutter of POIs/road shields) that reads much cleaner than the
-      // default OSM tiles at this size.
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: "© OpenStreetMap contributors © CARTO",
-        maxZoom: 19,
-      }).addTo(map);
+      // Esri's free "Light Gray Canvas" — a minimal grey basemap (no key
+      // required) with a thin separate label layer on top. CartoDB Positron
+      // was tried first but now requires an API key on this tier.
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        { attribution: "Esri, HERE, Garmin, © OpenStreetMap contributors", maxZoom: 16 }
+      ).addTo(map);
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 16 }
+      ).addTo(map);
       L.control.attribution({ prefix: false, position: "bottomright" }).addTo(map);
 
       const latLngs = points.map((p) => [p.lat, p.lng] as [number, number]);

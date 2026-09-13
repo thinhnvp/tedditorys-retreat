@@ -37,7 +37,7 @@ const guestProfile: GuestProfile = {
   hasRentalCar: false,
   preferences: ["food", "waterfront", "coffee", "quiet neighborhoods", "a little nightlife"],
   pace: "mixed",
-  notes: "First time in Seattle, staying solo — wants a mix of food and low-key exploring, open to one livelier night out.",
+  notes: "First time in Seattle! Traveling solo, so nothing too group-y — mostly just want good food and some low-key exploring. Would be down for one fun night out too if there's a good spot.",
 };
 
 const days: ItineraryDay[] = [

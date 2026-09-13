@@ -6,6 +6,7 @@ import type { GeoPoint } from "@/lib/itineraries";
 
 const ACCENT = "#3A6B57";
 const MUTED = "#B9C4BE";
+const FOCUS_ZOOM = 15;
 
 function dotIcon(L: typeof import("leaflet"), active: boolean) {
   const size = active ? 18 : 11;
@@ -19,7 +20,22 @@ function dotIcon(L: typeof import("leaflet"), active: boolean) {
   });
 }
 
-export default function ItineraryDayMap({ points, activeIndex }: { points: GeoPoint[]; activeIndex: number }) {
+export default function ItineraryDayMap({
+  points,
+  activeIndex,
+  defaultBoundsPoints,
+  focusPoints,
+}: {
+  points: GeoPoint[];
+  activeIndex: number;
+  /** What to fit on mount, before anything's selected — the day's actual
+   *  stops, not commute endpoints that might be miles apart. */
+  defaultBoundsPoints: GeoPoint[];
+  /** Where to focus for the current selection: one point to zoom in close
+   *  on a stop, or two to fit a commute leg — zooming out only when a
+   *  commute is actually what's being shown. */
+  focusPoints: GeoPoint[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const markersRef = useRef<import("leaflet").Marker[]>([]);
@@ -54,10 +70,12 @@ export default function ItineraryDayMap({ points, activeIndex }: { points: GeoPo
         })
       );
 
-      if (latLngs.length > 1) {
-        map.fitBounds(L.latLngBounds(latLngs), { padding: [32, 32] });
-      } else if (latLngs.length === 1) {
-        map.setView(latLngs[0], 14);
+      const boundsSource = defaultBoundsPoints.length > 0 ? defaultBoundsPoints : points;
+      const boundsLatLngs = boundsSource.map((p) => [p.lat, p.lng] as [number, number]);
+      if (boundsLatLngs.length > 1) {
+        map.fitBounds(L.latLngBounds(boundsLatLngs), { padding: [32, 32] });
+      } else if (boundsLatLngs.length === 1) {
+        map.setView(boundsLatLngs[0], FOCUS_ZOOM);
       }
 
       mapRef.current = map;
@@ -72,16 +90,21 @@ export default function ItineraryDayMap({ points, activeIndex }: { points: GeoPo
   }, []);
 
   useEffect(() => {
-    import("leaflet").then((L) => {
-      const map = mapRef.current;
-      const markers = markersRef.current;
-      if (!map || markers.length === 0) return;
+    const map = mapRef.current;
+    const markers = markersRef.current;
+    if (!map || markers.length === 0) return;
 
+    import("leaflet").then((L) => {
       markers.forEach((marker, i) => marker.setIcon(dotIcon(L, i === activeIndex)));
-      const target = points[activeIndex];
-      if (target) map.panTo([target.lat, target.lng], { animate: true, duration: 0.6 });
+
+      if (focusPoints.length === 1) {
+        map.flyTo([focusPoints[0].lat, focusPoints[0].lng], FOCUS_ZOOM, { animate: true, duration: 0.6 });
+      } else if (focusPoints.length > 1) {
+        const bounds = L.latLngBounds(focusPoints.map((p) => [p.lat, p.lng] as [number, number]));
+        map.flyToBounds(bounds, { padding: [48, 48], animate: true, duration: 0.6 });
+      }
     });
-  }, [activeIndex, points]);
+  }, [activeIndex, focusPoints]);
 
   return <div ref={containerRef} className="itinerary-map" />;
 }

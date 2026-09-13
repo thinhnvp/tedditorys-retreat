@@ -203,17 +203,25 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 48px
 
 .itinerary-map-wrap{position:sticky;top:88px}
 @media(max-width:820px){.itinerary-map-wrap{position:static;order:-1;margin-bottom:8px}}
-.itinerary-map{height:380px;border-radius:16px;overflow:hidden;background:var(--bg-alt)}
+/* isolation:isolate traps Leaflet's internal z-index (its zoom controls
+   go up to 1000) inside this box, so it can never render above the
+   fixed nav (z-index:50) regardless of Leaflet's own stacking. */
+.itinerary-map{height:380px;border-radius:16px;overflow:hidden;background:var(--bg-alt);position:relative;isolation:isolate}
 .itinerary-pin{background:transparent;border:none}
 .leaflet-tooltip{font-family:var(--sans);font-size:12.5px;padding:4px 9px;box-shadow:0 2px 10px rgba(0,0,0,.1);border:none}
 
 .itinerary-items{display:flex;flex-direction:column;gap:2px}
-.itinerary-items li{list-style:none;display:flex;gap:20px;align-items:flex-start;padding:13px 16px;cursor:pointer;border-radius:10px;border-left:3px solid transparent;transition:background .15s,border-color .15s}
+.itinerary-items li{list-style:none;display:flex;gap:14px;align-items:flex-start;padding:13px 16px;cursor:pointer;border-radius:10px;border-left:3px solid transparent;transition:background .15s,border-color .15s}
 .itinerary-items li:hover{background:var(--bg-alt)}
 .itinerary-items li.active{background:rgba(58,107,87,.07);border-left-color:var(--accent)}
 .itinerary-items li.commute{padding-top:8px;padding-bottom:8px;opacity:.75}
 .itinerary-items li.commute.active{opacity:1}
-.itinerary-time{flex:none;width:104px;font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+/* Circle = a stop worth visiting; small rotated square = transit between
+   stops — a shape difference reads at a glance without adding icon fonts. */
+.itinerary-kind-mark{flex:none;margin-top:5px;width:9px;height:9px;background:var(--accent);border-radius:50%}
+.itinerary-kind-mark.commute{width:6px;height:6px;background:var(--line);border-radius:2px;transform:rotate(45deg);margin-top:6px}
+.itinerary-items li.active .itinerary-kind-mark.commute{background:var(--accent)}
+.itinerary-time{flex:none;width:96px;font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .itinerary-items li.commute .itinerary-time{color:var(--muted);font-weight:500}
 .itinerary-title{font-size:16px;font-weight:600;letter-spacing:-.01em}
 .itinerary-items li.commute .itinerary-title{font-size:13.5px;font-weight:500;color:var(--muted)}

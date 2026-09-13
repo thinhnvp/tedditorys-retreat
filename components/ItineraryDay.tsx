@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ItineraryDay as ItineraryDayType, GeoPoint } from "@/lib/itineraries";
+import type { ItineraryDay as ItineraryDayType, ItineraryActivity, GeoPoint } from "@/lib/itineraries";
+
+function isActivity(item: { type: string }): item is ItineraryActivity {
+  return item.type === "activity";
+}
 import ItineraryDayMap from "./ItineraryDayMap";
 
 export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
@@ -25,6 +29,25 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
     });
     return pts;
   }, [day.items]);
+
+  // What the map should default to when nothing's selected yet — the
+  // day's actual stops, not the commute legs between them. A Renton ↔
+  // Seattle commute would otherwise force every view to zoom out to fit
+  // that whole span, shrinking the cluster of stops that matters most.
+  const activityPoints: GeoPoint[] = useMemo(
+    () => day.items.filter(isActivity).map((i) => i.location),
+    [day.items]
+  );
+
+  // Where the map should focus for the currently active item: one point
+  // (zoom in close) for an activity, or both ends of the leg (fit them
+  // both) for a commute — so zooming out only happens when actually
+  // showing a commute's distance.
+  const focusPoints: GeoPoint[] = useMemo(() => {
+    const item = day.items[activeIndex];
+    if (!item) return [];
+    return item.type === "activity" ? [item.location] : [item.from, item.to];
+  }, [day.items, activeIndex]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,6 +96,7 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
               key={i}
               onClick={() => handleSelect(i)}
             >
+              <span className={`itinerary-kind-mark ${item.type}`} aria-hidden="true" />
               <span className="itinerary-time">
                 {item.fromTime}–{item.toTime}
               </span>
@@ -95,7 +119,12 @@ export default function ItineraryDay({ day }: { day: ItineraryDayType }) {
         </ol>
 
         <div className="itinerary-map-wrap">
-          <ItineraryDayMap points={points} activeIndex={activeIndex + pointOffset} />
+          <ItineraryDayMap
+            points={points}
+            activeIndex={activeIndex + pointOffset}
+            defaultBoundsPoints={activityPoints}
+            focusPoints={focusPoints}
+          />
         </div>
       </div>
     </div>

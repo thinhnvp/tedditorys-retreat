@@ -39,6 +39,7 @@ export default function ItineraryDayMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const markersRef = useRef<import("leaflet").Marker[]>([]);
+  const highlightRef = useRef<import("leaflet").Polyline | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,6 +97,28 @@ export default function ItineraryDayMap({
 
     import("leaflet").then((L) => {
       markers.forEach((marker, i) => marker.setIcon(dotIcon(L, i === activeIndex)));
+
+      // Two focus points means the active item is a commute — draw its
+      // exact leg as a highlighted line on top of the base trajectory.
+      // Built from the commute's own from/to, not by indexing into the
+      // shared points array, since an activity can sit geographically
+      // between a commute's stated endpoint and the next stop.
+      if (focusPoints.length === 2) {
+        const legLatLngs = focusPoints.map((p) => [p.lat, p.lng] as [number, number]);
+        if (highlightRef.current) {
+          highlightRef.current.setLatLngs(legLatLngs);
+        } else {
+          highlightRef.current = L.polyline(legLatLngs, {
+            color: ACCENT,
+            weight: 4,
+            opacity: 0.9,
+            lineCap: "round",
+          }).addTo(map);
+        }
+      } else if (highlightRef.current) {
+        highlightRef.current.remove();
+        highlightRef.current = null;
+      }
 
       if (focusPoints.length === 1) {
         map.flyTo([focusPoints[0].lat, focusPoints[0].lng], FOCUS_ZOOM, { animate: true, duration: 0.6 });
